@@ -6,9 +6,9 @@ import NotePreviewClient from "./NotePreview.client";
 export default async function ModalNotePage({
   params,
 }: {
-  params: Promise<{ id: string }>; 
+  params: { id: string };
 }) {
-  const { id } = await params; 
+  const { id } = params;
 
   const queryClient = getQueryClient();
 

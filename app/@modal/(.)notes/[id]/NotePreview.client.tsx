@@ -1,39 +1,26 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { fetchNoteById } from "@/lib/api";
-import Modal from "@/components/Modal/Modal";
 
 export default function NotePreviewClient({ noteId }: { noteId: string }) {
-  const router = useRouter();
-
   const { data: note, isLoading, error } = useQuery({
     queryKey: ["note", noteId],
     queryFn: () => fetchNoteById(noteId),
-    enabled: !!noteId,              
-    refetchOnMount: false,           
+    enabled: !!noteId,
+    refetchOnMount: false,
   });
 
   if (isLoading) {
-    return (
-      <Modal onClose={() => router.back()}>
-        <p>Loading...</p>
-      </Modal>
-    );
+    return <p>Loading...</p>;
   }
 
   if (error || !note) {
-    return (
-      <Modal onClose={() => router.back()}>
-        <p>Failed to load note</p>
-        <button onClick={() => router.back()}>Close</button>
-      </Modal>
-    );
+    return <p>Failed to load note</p>;
   }
 
   return (
-    <Modal onClose={() => router.back()}>
+    <div>
       <h2>{note.title}</h2>
 
       <p><strong>Tag:</strong> {note.tag}</p>
@@ -44,8 +31,6 @@ export default function NotePreviewClient({ noteId }: { noteId: string }) {
         <strong>Created:</strong>{" "}
         {new Date(note.createdAt).toLocaleString()}
       </p>
-
-      <button onClick={() => router.back()}>Close</button>
-    </Modal>
+    </div>
   );
 }

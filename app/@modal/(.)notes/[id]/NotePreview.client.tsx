@@ -11,26 +11,15 @@ export default function NotePreviewClient({ noteId }: { noteId: string }) {
     refetchOnMount: false,
   });
 
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error || !note) {
-    return <p>Failed to load note</p>;
-  }
+  if (isLoading) return <p>Loading...</p>;
+  if (error || !note) return <p>Failed to load note</p>;
 
   return (
     <div>
       <h2>{note.title}</h2>
-
       <p><strong>Tag:</strong> {note.tag}</p>
-
       <p>{note.content}</p>
-
-      <p>
-        <strong>Created:</strong>{" "}
-        {new Date(note.createdAt).toLocaleString()}
-      </p>
+      <p><strong>Created:</strong> {new Date(note.createdAt).toLocaleString()}</p>
     </div>
   );
 }

@@ -1,15 +1,14 @@
 "use client";
 
 import Modal from "@/components/Modal/Modal";
-import NotePreviewClient from "../../../../../components/NotePreview/NotePreview"; 
-import { useRouter } from "next/navigation";
+import NotePreview from "@/components/NotePreview/NotePreview";
 
 export default function ModalNotePage({ params }: { params: { id: string } }) {
-  const router = useRouter();
+  const handleClose = () => window.history.back();
 
   return (
-    <Modal onClose={() => router.back()}>
-      <NotePreviewClient noteId={params.id} />
+    <Modal onClose={handleClose}>
+      <NotePreview id={params.id} />
     </Modal>
   );
 }

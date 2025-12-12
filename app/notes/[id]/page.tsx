@@ -4,12 +4,18 @@ import { fetchNoteById } from "@/lib/api";
 import NotePreviewClient from "../../@modal/(.)notes/[id]/NotePreview.client";
 import type { Metadata } from "next";
 
-type Props = {
-  params: { id: string };
+type Params = {
+  id: string;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = params;
+type Props = {
+  params: Promise<Params>;
+};
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const { id } = await params;
 
   return {
     title: `Note — ${id}`,
@@ -23,13 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-
-export default async function NotePage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+export default async function NotePage({ params }: Props) {
+  const { id } = await params;
 
   const queryClient = getQueryClient();
 
@@ -40,7 +41,7 @@ export default async function NotePage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <NotePreviewClient noteId={id} />
+      <NotePreviewClient id={id} />
     </HydrationBoundary>
   );
 }

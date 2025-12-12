@@ -4,21 +4,21 @@ import { fetchNoteById } from "@/lib/api";
 import NoteModalClient from "./NoteModalClient";
 
 interface ModalParams {
-  params: { id: string };
+  params: { noteId : string };
 }
 
 export default async function ModalNotePage({ params }: ModalParams) {
-  const { id } = params;
+  const { noteId  } = params;
 
   const qc = getQueryClient();
   await qc.prefetchQuery({
-    queryKey: ["note", id],
-    queryFn: () => fetchNoteById(id),
+    queryKey: ["note", noteId ],
+    queryFn: () => fetchNoteById(noteId ),
   });
 
   return (
     <HydrationBoundary state={dehydrate(qc)}>
-      <NoteModalClient noteId={id} />
+      <NoteModalClient noteId={noteId } />
     </HydrationBoundary>
   );
 }

@@ -23,7 +23,6 @@ type Props = {
 export default function NotesClient({ tag }: Props) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [debouncedSearch] = useDebounce(search, 500);
 
   const handleSearchChange = (value: string) => {
@@ -81,11 +80,7 @@ export default function NotesClient({ tag }: Props) {
       </header>
 
       {notes.length > 0 ? (
-        <NoteList
-          notes={notes}
-          deletingId={deletingId}
-          setDeletingId={setDeletingId}
-        />
+        <NoteList notes={notes} />
       ) : (
         !isFetching && <p className={css.empty}>Not found</p>
       )}

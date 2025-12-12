@@ -2,24 +2,29 @@ import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { getQueryClient } from "../../../../getQueryClient";
 import { fetchNotes } from "@/lib/api";
 import NotesByTagClient from "./NotesByTagClient";
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
-type Props = {
-  params: { tag: string };
+type PageProps = {
+  params: Promise<{ slug: string[] }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { tag } = params;
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
 
-  const url = `http://localhost:3000/notes/tag/${tag}`;
+  const tag = slug?.[0] ?? "all";
+  const url = `http://localhost:3000/notes/filter/${tag}`;
+
+  const title = `Tag Filter — ${tag}`;
+  const description = `Notes filtered by tag: ${tag}`;
 
   return {
-    title: `Tag Filter — ${tag}`,
-    description: `Notes filtered by tag: ${tag}`,
-
+    title,
+    description,
     openGraph: {
-      title: `Tag Filter — ${tag}`,
-      description: `Notes filtered by tag: ${tag}`,
+      title,
+      description,
       url,
       siteName: "NoteHub",
       images: [
@@ -34,23 +39,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-
-export default async function NotesByTagPage({
-  params,
-}: {
-  params: Promise<{ slug: string[] }>;
-}) {
-
+export default async function NotesByTagPage({ params }: PageProps) {
   const { slug } = await params;
 
   const tag = slug?.[0] ?? "all";
-  const query = tag === "all" ? undefined : tag;
+  const queryTag = tag === "all" ? undefined : tag;
 
   const queryClient = getQueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: ["notes", 1, query],
-    queryFn: () => fetchNotes({ page: 1, tag: query }),
+    queryKey: ["notes", 1, queryTag],
+    queryFn: () => fetchNotes({ page: 1, tag: queryTag }),
   });
 
   return (

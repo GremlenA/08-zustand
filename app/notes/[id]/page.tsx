@@ -4,33 +4,44 @@ import { fetchNoteById } from "@/lib/api";
 import NotePreviewClient from "../../@modal/(.)notes/[id]/NotePreview.client";
 import type { Metadata } from "next";
 
-type Params = {
-  id: string;
-};
-
 type Props = {
-  params: Promise<Params>;
+  params: { id: string };
 };
 
 export async function generateMetadata({
   params,
 }: Props): Promise<Metadata> {
-  const { id } = await params;
+  const { id } = params;
+
+  const note = await fetchNoteById(id);
+
+  const title = `Note — ${note.title}`;
+  const description = note.content.slice(0, 100);
+  const url = `http://localhost:3000/notes/${id}`;
 
   return {
-    title: `Note — ${id}`,
-    description: "Note details",
+    title,
+    description,
     openGraph: {
-      title: "Note",
-      description: "Note details",
-      type: "article",
+      title,
+      description,
+      url,
       siteName: "NoteHub",
+      type: "article",
+      images: [
+        {
+          url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+          width: 1200,
+          height: 630,
+          alt: note.title,
+        },
+      ],
     },
   };
 }
 
 export default async function NotePage({ params }: Props) {
-  const { id } = await params;
+  const { id } = params;
 
   const queryClient = getQueryClient();
 

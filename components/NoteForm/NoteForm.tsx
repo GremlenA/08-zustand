@@ -6,15 +6,20 @@ import type { NewNote } from "../../types/note";
 import { createNote } from "../../lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useNoteStore } from "@/lib/store/noteStore"; // если используешь Zustand draft
+import { useNoteStore } from "@/lib/store/noteStore";
 
 const tagOptions = ["Todo", "Work", "Personal", "Meeting", "Shopping"] as const;
 
-export default function NoteForm() {
+type NoteFormProps = {
+  onCancel?: () => void;
+  onSuccess?: () => void;
+};
+
+export default function NoteForm({ onCancel, onSuccess }: NoteFormProps) {
   const router = useRouter();
   const qc = useQueryClient();
 
-  // Zustand draft store (если у тебя он реализован)
+  
   const draft = useNoteStore((s) => s.draft);
   const setDraft = useNoteStore((s) => s.setDraft);
   const clearDraft = useNoteStore((s) => s.clearDraft);
@@ -23,12 +28,18 @@ export default function NoteForm() {
     mutationFn: (data: NewNote) => createNote(data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["notes"] });
-      clearDraft();        // очищаем черновик
-      router.back();       // возвращаемся назад
+      clearDraft();
+
+     
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        router.back();
+      }
     },
   });
 
-  // обработчик создания
+ 
   const handleCreate = async (formData: FormData) => {
     const title = String(formData.get("title") ?? "");
     const content = String(formData.get("content") ?? "");
@@ -37,9 +48,13 @@ export default function NoteForm() {
     await mutation.mutateAsync({ title, content, tag });
   };
 
-  // обработчик Cancel
+
   const handleCancel = () => {
-    router.back();
+    if (onCancel) {
+      onCancel();
+    } else {
+      router.back();
+    }
   };
 
   return (
@@ -50,13 +65,15 @@ export default function NoteForm() {
         <div className={css.formGroup}>
           <label htmlFor="title">Title</label>
           <input
-            type="text"
             id="title"
             name="title"
+            type="text"
             className={css.input}
             required
             value={draft.title}
-            onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+            onChange={(e) =>
+              setDraft({ ...draft, title: e.target.value })
+            }
           />
         </div>
 
@@ -68,7 +85,9 @@ export default function NoteForm() {
             rows={8}
             className={css.textarea}
             value={draft.content}
-            onChange={(e) => setDraft({ ...draft, content: e.target.value })}
+            onChange={(e) =>
+              setDraft({ ...draft, content: e.target.value })
+            }
           />
         </div>
 
@@ -79,7 +98,9 @@ export default function NoteForm() {
             name="tag"
             className={css.select}
             value={draft.tag}
-            onChange={(e) => setDraft({ ...draft, tag: e.target.value })}
+            onChange={(e) =>
+              setDraft({ ...draft, tag: e.target.value })
+            }
           >
             {tagOptions.map((t) => (
               <option key={t} value={t}>

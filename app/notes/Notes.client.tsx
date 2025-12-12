@@ -5,8 +5,8 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import NoteList from "../../components/NoteList/NoteList";
 import SearchBox from "../../components/SearchBox/SearchBox";
 import { useDebounce } from "use-debounce";
-import { fetchNotes } from "../lib/api";
-import type { FetchNotesResponse } from "../lib/api";
+import { fetchNotes } from "../../lib/api";
+import type { FetchNotesResponse } from "../../lib/api";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import css from "./NotesPage.module.css";
@@ -27,7 +27,7 @@ export default function NotesClient({ tag }: NotesClientProps) {
 
   const [debouncedSearch] = useDebounce(search, 500);
 
-  // нормализуем тег: "all" означает отсутствие фильтра
+  
   const normalizedTag = tag === "all" ? undefined : tag;
 
   const queryKey = ["notes", page, debouncedSearch, normalizedTag] as const;
